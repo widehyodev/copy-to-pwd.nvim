@@ -1,46 +1,46 @@
-*copy_to_pwd.txt*           For Neovim >= 0.8.0      Last change: 2025 January 14
+*copy_to_pwd.txt*        For Neovim >= 0.8.0       Last change: 2025 August 24
 
 ==============================================================================
-Table of Contents                                *copy-to-pwd-table-of-contents*
+Table of Contents                              *copy_to_pwd-table-of-contents*
 
-1. Introduction                                        |copy-to-pwd-introduction|
-2. Installation                                        |copy-to-pwd-installation|
-3. Configuration                                      |copy-to-pwd-configuration|
-4. Commands                                              |copy-to-pwd-commands|
-5. Keymappings                                        |copy-to-pwd-keymappings|
-6. Lua API                                                |copy-to-pwd-lua-api|
-7. Use Cases                                            |copy-to-pwd-use-cases|
-8. Examples                                              |copy-to-pwd-examples|
-9. Troubleshooting                                |copy-to-pwd-troubleshooting|
-10. License                                              |copy-to-pwd-license|
-
-==============================================================================
-1. Introduction                                        *copy-to-pwd-introduction*
-
-copy-to-pwd.nvim is a simple yet powerful Neovim plugin that allows you to
-quickly copy the current buffer's content to a file in your present working
-directory (pwd).
-
-The plugin provides an intuitive interface for duplicating files, creating
-backups, and managing file copies within your development workflow.
-
-Features:~
-• Quick File Copying: Copy current buffer content to pwd with a single command
-• Smart Filename Detection: Automatically uses current buffer's filename as default
-• Custom Filename Support: Specify a different filename when copying
-• Overwrite Protection: Confirms before overwriting existing files
-• User-Friendly: Provides clear notifications and error messages
-• Configurable: Customize behavior through setup options
-• Zero Dependencies: Pure Lua implementation with no external dependencies
-
-Requirements:~
-• Neovim >= 0.8.0
-• No external dependencies
+1. copy-to-pwd.nvim                             |copy_to_pwd-copy-to-pwd.nvim|
+  - Features                           |copy_to_pwd-copy-to-pwd.nvim-features|
+  - Installation                   |copy_to_pwd-copy-to-pwd.nvim-installation|
+  - Usage                                 |copy_to_pwd-copy-to-pwd.nvim-usage|
+  - Configuration                 |copy_to_pwd-copy-to-pwd.nvim-configuration|
+  - Use Cases                         |copy_to_pwd-copy-to-pwd.nvim-use-cases|
+  - Examples                           |copy_to_pwd-copy-to-pwd.nvim-examples|
+  - Requirements                   |copy_to_pwd-copy-to-pwd.nvim-requirements|
+  - Contributing                   |copy_to_pwd-copy-to-pwd.nvim-contributing|
+  - License                             |copy_to_pwd-copy-to-pwd.nvim-license|
+  - Acknowledgments             |copy_to_pwd-copy-to-pwd.nvim-acknowledgments|
+2. Links                                                   |copy_to_pwd-links|
 
 ==============================================================================
-2. Installation                                        *copy-to-pwd-installation*
+1. copy-to-pwd.nvim                             *copy_to_pwd-copy-to-pwd.nvim*
 
-Using lazy.nvim:~
+
+
+A simple yet powerful Neovim plugin that allows you to quickly copy the current
+buffer’s content to a file in your present working directory (pwd).
+
+
+FEATURES                               *copy_to_pwd-copy-to-pwd.nvim-features*
+
+- **Quick File Copying**Copy current buffer content to pwd with a single command
+- **Smart Filename Detection**Automatically uses current buffer’s filename as default
+- **Custom Filename Support**Specify a different filename when copying
+- **Overwrite Protection**Confirms before overwriting existing files
+- **User-Friendly**Provides clear notifications and error messages
+- **Configurable**Customize behavior through setup options
+- **Zero Dependencies**Pure Lua implementation with no external dependencies
+
+
+INSTALLATION                       *copy_to_pwd-copy-to-pwd.nvim-installation*
+
+
+USING LAZY.NVIM ~
+
 >lua
     {
       "widehyodev/copy-to-pwd.nvim",
@@ -50,7 +50,9 @@ Using lazy.nvim:~
     }
 <
 
-Using packer.nvim:~
+
+USING PACKER.NVIM ~
+
 >lua
     use {
       "widehyodev/copy-to-pwd.nvim",
@@ -60,237 +62,149 @@ Using packer.nvim:~
     }
 <
 
-Using vim-plug:~
+
+USING VIM-PLUG ~
+
 >vim
     Plug 'widehyodev/copy-to-pwd.nvim'
 <
 
 Then add to your init.lua:
+
 >lua
     require("copy_to_pwd").setup()
 <
 
-==============================================================================
-3. Configuration                                      *copy-to-pwd-configuration*
 
-The plugin can be configured through the setup function. All configuration
-options are optional and have sensible defaults.
+USAGE                                     *copy_to_pwd-copy-to-pwd.nvim-usage*
 
-Configuration Options:~
 
-                                                    *copy-to-pwd-confirm_overwrite*
-confirm_overwrite~
-Type: boolean
-Default: true
-Description: Ask for confirmation before overwriting existing files
+COMMANDS ~
 
-                                                    *copy-to-pwd-notify_on_success*
-notify_on_success~
-Type: boolean  
-Default: true
-Description: Show notification when file is successfully copied
+- `:CopyToPwd` - Copy current buffer to pwd using current filename
+- `:CopyToPwd filename.txt` - Copy current buffer to pwd with specified filename
 
-                                                      *copy-to-pwd-default_keymap*
-default_keymap~
-Type: boolean
-Default: true
-Description: Set up default keymap `<leader>cpwd`
 
-Example Configuration:~
+DEFAULT KEYMAPPING ~
+
+- `<leader>cpwd` - Opens command line with `:CopyToPwd` ready for filename input
+
+
+LUA API ~
+
+>lua
+    local copy_to_pwd = require("copy_to_pwd")
+    
+    -- Copy with default filename
+    copy_to_pwd.copy_to_pwd()
+    
+    -- Copy with custom filename
+    copy_to_pwd.copy_to_pwd("my_file.lua")
+    
+    -- Get information about current copy operation
+    local info = copy_to_pwd.get_info()
+    print(info.current_file, info.pwd, info.target_path)
+<
+
+
+CONFIGURATION                     *copy_to_pwd-copy-to-pwd.nvim-configuration*
+
 >lua
     require("copy_to_pwd").setup({
+      -- Whether to confirm before overwriting existing files (default: true)
       confirm_overwrite = true,
+      
+      -- Whether to show notification on successful copy (default: true)
       notify_on_success = true,
+      
+      -- Whether to set up default keymap <leader>cpwd (default: true)
       default_keymap = true,
     })
 <
 
-==============================================================================
-4. Commands                                              *copy-to-pwd-commands*
 
-                                                               *:CopyToPwd*
-:CopyToPwd [filename]
-    Copy current buffer to present working directory.
-    
-    If no filename is provided, uses the current buffer's filename.
-    If filename is provided, uses that as the target filename.
-    
-    Examples:
-        :CopyToPwd                  " Copy with current buffer's filename
-        :CopyToPwd backup.lua       " Copy with custom filename
-        :CopyToPwd ../config.lua    " Copy to parent directory
+CONFIGURATION OPTIONS ~
 
-==============================================================================
-5. Keymappings                                        *copy-to-pwd-keymappings*
+  ---------------------------------------------------------------------------
+  Option              Type        Default           Description
+  ------------------- ----------- ----------------- -------------------------
+  confirm_overwrite   boolean     true              Ask for confirmation
+                                                    before overwriting
+                                                    existing files
 
-Default Keymapping:~
+  notify_on_success   boolean     true              Show notification when
+                                                    file is successfully
+                                                    copied
 
-                                                         *copy-to-pwd-<leader>cpwd*
-<leader>cpwd
-    Opens command line with `:CopyToPwd ` ready for filename input.
-    This keymap is enabled by default but can be disabled through configuration.
+  default_keymap      boolean     true              Set up default keymap
+                                                    <leader>cpwd
+  ---------------------------------------------------------------------------
 
-Custom Keymapping Example:~
->lua
-    -- Disable default keymap and set custom one
-    require("copy_to_pwd").setup({
-      default_keymap = false,
-    })
-    
-    -- Set custom keymap
-    vim.keymap.set('n', '<leader>cp', ':CopyToPwd ', { desc = "Copy to pwd" })
-<
+USE CASES                             *copy_to_pwd-copy-to-pwd.nvim-use-cases*
 
-==============================================================================
-6. Lua API                                                *copy-to-pwd-lua-api*
+1. **Quick File Duplication**Duplicate a file in your current working directory
+2. **Template Creation**Copy template files to your project directory
+3. **Backup Creation**Create quick backups of important files
+4. **File Organization**Copy files from various locations to a central directory
+5. **Development Workflow**Copy configuration files or scripts to project root
 
-                                                      *copy-to-pwd.copy_to_pwd()*
-copy_to_pwd.copy_to_pwd({filename})
-    Copy current buffer to pwd with optional filename.
-    
-    Parameters:~
-        {filename} (string|nil) Optional filename, defaults to current buffer name
-    
-    Returns:~
-        boolean: true if successful, false otherwise
-    
-    Example:~
-    >lua
-        local copy_to_pwd = require("copy_to_pwd")
-        
-        -- Copy with default filename
-        copy_to_pwd.copy_to_pwd()
-        
-        -- Copy with custom filename
-        copy_to_pwd.copy_to_pwd("my_file.lua")
-    <
 
-                                                          *copy-to-pwd.get_info()*
-copy_to_pwd.get_info()
-    Get information about current copy operation.
-    
-    Returns:~
-        table: {
-          current_file = string,  -- Current buffer's filename
-          pwd = string,           -- Present working directory
-          target_path = string    -- Full target path
-        }
-    
-    Example:~
-    >lua
-        local info = require("copy_to_pwd").get_info()
-        print("Current file:", info.current_file)
-        print("PWD:", info.pwd)
-        print("Target path:", info.target_path)
-    <
+EXAMPLES                               *copy_to_pwd-copy-to-pwd.nvim-examples*
 
-                                                            *copy-to-pwd.setup()*
-copy_to_pwd.setup({config})
-    Setup function for copy-to-pwd plugin.
-    
-    Parameters:~
-        {config} (table|nil) Configuration options table
-    
-    Example:~
-    >lua
-        require("copy_to_pwd").setup({
-          confirm_overwrite = false,
-          notify_on_success = true,
-          default_keymap = false,
-        })
-    <
 
-==============================================================================
-7. Use Cases                                            *copy-to-pwd-use-cases*
+EXAMPLE 1: COPY CURRENT FILE WITH SAME NAME ~
 
-1. Quick File Duplication~
-   Duplicate a file in your current working directory for backup or modification.
-
-2. Template Creation~
-   Copy template files to your project directory when starting new features.
-
-3. Backup Creation~
-   Create quick backups of important files before making significant changes.
-
-4. File Organization~
-   Copy files from various locations to a central directory for organization.
-
-5. Development Workflow~
-   Copy configuration files or scripts to project root for easy access.
-
-6. Code Sharing~
-   Copy specific files to a shared directory for collaboration.
-
-==============================================================================
-8. Examples                                              *copy-to-pwd-examples*
-
-Example 1: Copy current file with same name~
 >
     :CopyToPwd
 <
-If you're editing `/home/user/projects/myproject/src/utils.lua` and your pwd is
-`/home/user/projects/myproject`, this will create 
+
+If you’re editing `/home/user/projects/myproject/src/utils.lua` and your pwd
+is `/home/user/projects/myproject`, this will create
 `/home/user/projects/myproject/utils.lua`.
 
-Example 2: Copy with different name~
+
+EXAMPLE 2: COPY WITH DIFFERENT NAME ~
+
 >
     :CopyToPwd backup_utils.lua
 <
+
 This creates `/home/user/projects/myproject/backup_utils.lua`.
 
-Example 3: Using keymap~
+
+EXAMPLE 3: USING KEYMAP ~
+
 Press `<leader>cpwd`, then type the desired filename and press Enter.
 
-Example 4: Programmatic usage~
->lua
-    local copy_to_pwd = require("copy_to_pwd")
-    
-    -- Check if we can copy
-    local info = copy_to_pwd.get_info()
-    if info.current_file ~= "" then
-        copy_to_pwd.copy_to_pwd("backup_" .. info.current_file)
-    end
-<
+
+REQUIREMENTS                       *copy_to_pwd-copy-to-pwd.nvim-requirements*
+
+- Neovim >= 0.8.0
+- No external dependencies
+
+
+CONTRIBUTING                       *copy_to_pwd-copy-to-pwd.nvim-contributing*
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+
+LICENSE                                 *copy_to_pwd-copy-to-pwd.nvim-license*
+
+This project is licensed under the MIT License - see the LICENSE <LICENSE> file
+for details.
+
+
+ACKNOWLEDGMENTS                 *copy_to_pwd-copy-to-pwd.nvim-acknowledgments*
+
+- Inspired by common file management needs in Neovim workflows
+- Built with the Neovim Lua API
 
 ==============================================================================
-9. Troubleshooting                                *copy-to-pwd-troubleshooting*
+2. Links                                                   *copy_to_pwd-links*
 
-Common Issues:~
+1. *Lua*: https://img.shields.io/badge/Made%20with%20Lua-blueviolet.svg?style=for-the-badge&logo=lua
+2. *Neovim*: https://img.shields.io/badge/NeoVim-%2357A143.svg?&style=for-the-badge&logo=neovim&logoColor=white
 
-Issue: "Current buffer has no name"~
-Solution: Save the buffer first with `:w filename` or provide a filename 
-parameter to the command.
-
-Issue: "Could not determine filename"~
-Solution: This occurs when the current buffer is unnamed. Either save the 
-buffer first or specify a filename when calling the command.
-
-Issue: Plugin not working after installation~
-Solution: Ensure you've called the setup function in your configuration:
->lua
-    require("copy_to_pwd").setup()
-<
-
-Issue: Keymap not working~
-Solution: Check if default_keymap is enabled in configuration and ensure there's
-no keymap conflict.
-
-Issue: File not being copied~
-Solution: Check file permissions and ensure the target directory is writable.
-
-Debug Information:~
-Use the get_info() function to debug copy operations:
->lua
-    local info = require("copy_to_pwd").get_info()
-    print(vim.inspect(info))
-<
-
-==============================================================================
-10. License                                              *copy-to-pwd-license*
-
-This project is licensed under the MIT License.
-
-==============================================================================
 Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
 
 vim:tw=78:ts=8:noet:ft=help:norl:
