@@ -25,24 +25,20 @@ M.config = config
 -- - default_keymap: Set up default keymap <leader>cpwd (default: true)
 M.setup = function(args)
   M.config = vim.tbl_deep_extend("force", M.config, args or {})
-  
+
   -- Set up user command
-  vim.api.nvim_create_user_command(
-    'CopyToPwd',
-    function(opts)
-      local filename = opts.fargs[1]
-      M.copy_to_pwd(filename)
-    end,
-    {
-      nargs = "?",
-      desc = "Copy current buffer to present working directory",
-      complete = "file"
-    }
-  )
-  
+  vim.api.nvim_create_user_command("CopyToPwd", function(opts)
+    local filename = opts.fargs[1]
+    M.copy_to_pwd(filename)
+  end, {
+    nargs = "?",
+    desc = "Copy current buffer to present working directory",
+    complete = "file",
+  })
+
   -- Set up default keymap if enabled
   if M.config.default_keymap then
-    vim.keymap.set('n', '<leader>cpwd', ':CopyToPwd ', { desc = "Copy to pwd" })
+    vim.keymap.set("n", "<leader>cpwd", ":CopyToPwd ", { desc = "Copy to pwd" })
   end
 end
 
@@ -50,11 +46,11 @@ end
 ---@param filename string|nil Optional filename, defaults to current buffer name
 M.copy_to_pwd = function(filename)
   local success, error_msg = module.copy_to_pwd(filename)
-  
+
   if not success and error_msg then
     vim.notify("Error: " .. error_msg, vim.log.levels.ERROR)
   end
-  
+
   return success
 end
 
